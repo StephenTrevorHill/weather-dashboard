@@ -1,4 +1,5 @@
 # Weather Dashboard 🌤️
+![Test Status](https://github.com/StephenTrevorHill/weather-dashboard/actions/workflows/test.yml/badge.svg)
 
 A simple Flask web app that fetches current weather and air quality data for a city using the OpenWeatherMap API.
 
