@@ -20,9 +20,11 @@
   {% if weather %}
   <div class="card">
     <h2>Weather in {{ weather.name }}</h2>
-    <p>Temperature: {{ weather.main.temp }} °C</p>
+    <p>Temperature: {{ weather.main.temp }} °C Feels Like {{ weather.main.feels_like }}</p>
     <p>Condition: {{ weather.weather[0].description }}</p>
     <p>Humidity: {{ weather.main.humidity }}%</p>
+    <p>Pressure: {{ weather.main.pressure/10 }} kPa</p>
+    <p title="Converted from m/s to km/h"> Wind Speed: {{ (weather.wind.speed * 3.6) | round(1) }} Km/h</p>
   </div>
   {% endif %}
   {% if air %}

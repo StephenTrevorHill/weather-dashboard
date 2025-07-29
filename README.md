@@ -44,10 +44,9 @@ A simple Flask web app that fetches current weather and air quality data for a c
    ```
 
 4. Add your API key:
-   • Create a .env file with:
-   OPENWEATHER_API_KEY=your_api_key_here
+- Create a .env file with:
+- OPENWEATHER_API_KEY=your_api_key_here
 
 5. Run locally:
    ```bash
    flask run
-   ```
