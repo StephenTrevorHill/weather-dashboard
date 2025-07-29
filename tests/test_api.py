@@ -12,3 +12,8 @@ def test_weather_route():
     data = response.get_json()
     assert "weather" in data
     assert "air_quality" in data
+    assert "main" in data["weather"]
+    assert "pressure" in data["weather"]["main"]
+    assert "humidity" in data["weather"]["main"]
+    assert "wind" in  data["weather"]
+    assert "speed" in  data["weather"]["wind"]

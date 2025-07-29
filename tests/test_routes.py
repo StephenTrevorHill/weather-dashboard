@@ -19,6 +19,11 @@ def test_homepage_shows_weather_on_post():
     soup = BeautifulSoup(res.data, "html.parser")
     assert soup.find("h2")  # Check if a heading is present
 
+    weather_card = soup.find_all("div", class_="card")[0]
+    assert "Wind Speed" in weather_card.text
+    assert "Pressure" in weather_card.text
+    assert "Feels Like" in weather_card.text
+
     pollutant_heading =soup.find("h3")
     assert pollutant_heading and "Pollutants:" in pollutant_heading.text
 
@@ -29,3 +34,4 @@ def test_homepage_shows_weather_on_post():
     rows = pollutant_table.find_all("tr")
     # 1 header row + 8 pollutant rows
     assert len(rows) == 9
+
