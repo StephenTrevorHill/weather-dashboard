@@ -1,10 +1,17 @@
+import json
 import os
 
 import requests
 from dotenv import load_dotenv
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
+
+# preload city and country tables to global variables
+with open('data/en/countries.json', encoding='utf-8') as f:
+    COUNTRIES = json.load(f)
+with open('data/en/cities.json', encoding='utf-8') as f:
+    CITIES_BY_COUNTRY = json.load(f)
 
 load_dotenv()
 API_KEY = os.getenv('OPENWEATHER_API_KEY')
@@ -107,4 +114,50 @@ def weather_api():
 if __name__ == '__main__':
     app.run(debug=True)
 
-# dummy change to trigger pre-commit
+
+# @app.route('/api/countries')
+# def get_countries():
+#     # Mocked country list
+#     countries = [
+#         'Canada',
+#         'United States',
+#         'United Kingdom',
+#         'Australia',
+#         'Germany',
+#         'India',
+#         'Japan',
+#     ]
+#     return jsonify(countries)
+
+
+# @app.route('/api/cities')
+# def get_cities():
+#     country = request.args.get('country')
+
+#     mock_data = {
+#         'Canada': ['Toronto', 'Vancouver', 'Montreal', 'Calgary'],
+#         'United States': ['New York', 'Los Angeles', 'Chicago', 'Houston'],
+#         'United Kingdom': ['London', 'Manchester', 'Birmingham', 'Liverpool'],
+#     }
+
+#     cities = mock_data.get(country, [])
+#     return jsonify(cities)
+
+
+@app.route('/api/countries')
+def get_countries():
+    # countries are pre-loaded to a global variable from a json file
+
+    country_list = [item['label'] for item in COUNTRIES]
+    return jsonify(country_list)
+
+
+@app.route('/api/cities')
+def get_cities():
+    country = request.args.get('country')
+
+    city_list_raw = CITIES_BY_COUNTRY.get(country, [])
+    city_list = [item['label'] for item in city_list_raw]
+    city_list.sort()
+
+    return jsonify(city_list)

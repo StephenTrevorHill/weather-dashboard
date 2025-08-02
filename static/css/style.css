@@ -68,3 +68,11 @@ tr:nth-child(even) {
 tr:hover {
   background-color: #f1f7ff;
 }
+
+input[type="text"], select {
+  font-size: 1.1rem;    /* Make text a bit larger */
+  padding: 10px;        /* Increase height and internal padding */
+  margin-bottom: 12px;  /* Space between fields */
+  width: 100%;          /* Optional: make them fill their container */
+  box-sizing: border-box;
+}
