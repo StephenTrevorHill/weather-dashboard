@@ -68,7 +68,7 @@ This document tracks key development milestones, decisions, and learnings.
 - Tested failing + fixed commits to validate pipeline behavior
 - Signed up for RapidAPI using Github
 
-## [2024-08-03] Country/City Picker + Styling + Tests
+## [2024-08-01] Country/City Picker + Styling + Tests
 
 - Added JavaScript-based country and city pickers
 - Replaced stub API with local JSON data
@@ -76,6 +76,11 @@ This document tracks key development milestones, decisions, and learnings.
 - Wrote tests for country/city integration
 - Updated linter config (Ruff + formatter)
 - Tagged version as `v0.5`
+
+## [2024-08-02]
+- simplified format of json files - SMP-17 Clean up formatting of JSON files - changed/tested/merged
+- removed and then re-added engineering log to tracking
+
 
 ## To-Dos ##
 - logging
