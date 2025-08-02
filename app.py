@@ -63,7 +63,7 @@ def index():
                 named_components = {
                     AIR_COMPONENT_LABELS.get(k, k): v for k, v in raw_components.items()
                 }
-                print(named_components)
+                # print(named_components)
 
             except Exception as e:
                 error = f'Error: {e}'
@@ -148,16 +148,15 @@ if __name__ == '__main__':
 def get_countries():
     # countries are pre-loaded to a global variable from a json file
 
-    country_list = [item['label'] for item in COUNTRIES]
-    return jsonify(country_list)
+    return COUNTRIES
 
 
 @app.route('/api/cities')
 def get_cities():
     country = request.args.get('country')
 
-    city_list_raw = CITIES_BY_COUNTRY.get(country, [])
-    city_list = [item['label'] for item in city_list_raw]
-    city_list.sort()
+    city_list = CITIES_BY_COUNTRY.get(country, [])
+    # city_list = [item['label'] for item in city_list_raw]
+    # city_list.sort()
 
     return jsonify(city_list)
