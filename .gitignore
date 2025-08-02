@@ -2,3 +2,9 @@ __pycache__/
 *.pyc
 .env
 venv/
+engineering-log.md
+requirements manual.txt
+utilities/
+data/en/archive
+.DS_Store
+data/en/.DS_Store
