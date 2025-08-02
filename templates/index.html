@@ -9,8 +9,17 @@
 <body>
   <h1>Weather Dashboard</h1>
   <form method="POST">
-    <input type="text" name="city" placeholder="Enter city name" required>
-    <button type="submit">Get Weather</button>
+    <div>
+      <select id="country-picker">
+        <option value="">Select country</option>
+      </select>
+    </div>
+    <div><select id="city-picker" name="city" required disabled>
+        <option value="">Select city</option>
+      </select> </div>
+    <div>
+      <button type="submit">Get Weather</button>
+    </div>
   </form>
 
   {% if error %}
@@ -57,6 +66,46 @@
     </table>
   </div>
   {% endif %}
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const countryPicker = document.getElementById("country-picker");
+      const cityPicker = document.getElementById("city-picker");
+
+      // Fetch country list
+      fetch("/api/countries")
+        .then(res => res.json())
+        .then(countries => {
+          countries.forEach(country => {
+            const option = document.createElement("option");
+            option.value = country;
+            option.textContent = country;
+            countryPicker.appendChild(option);
+          });
+        });
+
+      // Load cities on country change
+      countryPicker.addEventListener("change", () => {
+        const country = countryPicker.value;
+        cityPicker.innerHTML = '<option value="">Select city</option>';
+        cityPicker.disabled = true;
+
+        if (country) {
+          fetch(`/api/cities?country=${encodeURIComponent(country)}`)
+            .then(res => res.json())
+            .then(cities => {
+              cities.forEach(city => {
+                const option = document.createElement("option");
+                option.value = city;
+                option.textContent = city;
+                cityPicker.appendChild(option);
+              });
+              cityPicker.disabled = false;
+            });
+        }
+      });
+    });
+  </script>
 
 </body>
 
