@@ -9,16 +9,19 @@ from app import app
 
 def test_weather_route():
     client = app.test_client()
-    response = client.post('/api/weather', data={'city': 'Toronto'})
+    response = client.get('/api/city-weather?city=Toronto')
+
     assert response.status_code == 200
     data = response.get_json()
     assert 'weather' in data
-    assert 'air_quality' in data
+    assert 'aqi' in data['air']['main']
+    assert 'no2' in data['air']['components']
     assert 'main' in data['weather']
     assert 'pressure' in data['weather']['main']
     assert 'humidity' in data['weather']['main']
     assert 'wind' in data['weather']
     assert 'speed' in data['weather']['wind']
+    assert 'Nitric Oxide (NO)' in data['air_components']
 
 
 def test_get_countries():
