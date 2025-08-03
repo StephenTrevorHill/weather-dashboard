@@ -30,118 +30,79 @@ AIR_COMPONENT_LABELS = {
 }
 
 
+# primary route - get data and present template
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    if request.method == 'POST':
+        city = request.form.get('city')
+        context = get_all_weather_data(city)
+        return render_template('index.html', **context)
+
+    # GET: just show the empty form
+    return render_template('index.html')
+
+
+def get_all_weather_data(city):
     weather_data = None
     air_quality = None
     error = None
     named_components = None
 
-    if request.method == 'POST':
-        city = request.form.get('city')
-        if city:
-            try:
-                # Get weather
-                weather_url = f'https://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={API_KEY}'
-                res = requests.get(weather_url)
-                res.raise_for_status()
-                weather_data = res.json()
+    if city:
+        try:
+            # Get weather
+            weather_data = get_weather(city)
 
-                # Get Air Quality using lat/long from previous call
-                lat = weather_data['coord']['lat']
-                lon = weather_data['coord']['lon']
-                air_url = f'https://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={API_KEY}'
-                aq_res = requests.get(air_url)
-                aq_res.raise_for_status()
-                # grab first (and only) result
-                air_quality = aq_res.json()['list'][0]
-                # print(air_quality)
+            # Get Air Quality using lat/long from previous call
+            lat = weather_data['coord']['lat']
+            lon = weather_data['coord']['lon']
+            air_quality = get_aqi_data(lat, lon)
 
-                # create a new dict with the air quality components mapped to the friendly names
-                raw_components = air_quality['components']
-                # print(raw_components)
-                named_components = {
-                    AIR_COMPONENT_LABELS.get(k, k): v for k, v in raw_components.items()
-                }
-                # print(named_components)
+            # create a new dict with the air quality components mapped to the friendly names
+            raw_components = air_quality['components']
+            named_components = {
+                AIR_COMPONENT_LABELS.get(k, k): v for k, v in raw_components.items()
+            }
 
-            except Exception as e:
-                error = f'Error: {e}'
+        except Exception as e:
+            error = f'Error: {e}'
 
-    return render_template(
-        'index.html',
-        weather=weather_data,
-        air=air_quality,
-        air_components=named_components,
-        error=error,
-    )
+    return {
+        'weather': weather_data,
+        'air': air_quality,
+        'air_components': named_components,
+        'error': error,
+    }
 
 
-@app.route('/api/weather', methods=['POST'])
-def weather_api():
-    city = request.form.get('city')
+@app.route('/api/city-weather', methods=['GET', 'POST'])  # testable route
+def city_weather():
+    city = request.args.get('city')
     if not city:
-        return {'error': 'Missing city'}, 400
-
-    try:
-        # 1. Get weather data (includes lat/lon)
-        weather_url = (
-            f'https://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={API_KEY}'
-        )
-        weather_res = requests.get(weather_url)
-        weather_res.raise_for_status()
-        weather_data = weather_res.json()
-
-        lat = weather_data['coord']['lat']
-        lon = weather_data['coord']['lon']
-
-        # 2. Get air quality data using lat/lon
-        air_url = f'https://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={API_KEY}'
-        air_res = requests.get(air_url)
-        air_res.raise_for_status()
-        air_data = air_res.json()
-
-        # 3. Combine and return both sets of data
-        return {
-            'weather': weather_data,
-            'air_quality': air_data,
-        }
-
-    except Exception as e:
-        return {'error': str(e)}, 500
+        return jsonify({'error': 'Missing city parameter'}), 400
+    return jsonify(get_all_weather_data(city))
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+def get_weather(city):
+    weather_url = (
+        f'https://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={API_KEY}'
+    )
+    res = requests.get(weather_url)
+    res.raise_for_status()
+    weather_data = res.json()
+    return weather_data
 
 
-# @app.route('/api/countries')
-# def get_countries():
-#     # Mocked country list
-#     countries = [
-#         'Canada',
-#         'United States',
-#         'United Kingdom',
-#         'Australia',
-#         'Germany',
-#         'India',
-#         'Japan',
-#     ]
-#     return jsonify(countries)
-
-
-# @app.route('/api/cities')
-# def get_cities():
-#     country = request.args.get('country')
-
-#     mock_data = {
-#         'Canada': ['Toronto', 'Vancouver', 'Montreal', 'Calgary'],
-#         'United States': ['New York', 'Los Angeles', 'Chicago', 'Houston'],
-#         'United Kingdom': ['London', 'Manchester', 'Birmingham', 'Liverpool'],
-#     }
-
-#     cities = mock_data.get(country, [])
-#     return jsonify(cities)
+def get_aqi_data(lat, lon):
+    # Get Air Quality using lat/long from weather call
+    air_url = (
+        f'https://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={API_KEY}'
+    )
+    aq_res = requests.get(air_url)
+    aq_res.raise_for_status()
+    # grab first (and only) result
+    air_quality = aq_res.json()['list'][0]
+    return air_quality
 
 
 @app.route('/api/countries')
@@ -160,3 +121,7 @@ def get_cities():
     # city_list.sort()
 
     return jsonify(city_list)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
