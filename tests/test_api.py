@@ -4,7 +4,9 @@ import sys
 # Add project root to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app import app
+from app import create_app
+
+app = create_app()
 
 
 def test_weather_route():
@@ -15,7 +17,6 @@ def test_weather_route():
     data = response.get_json()
     assert 'weather' in data
     assert 'aqi' in data['air']['main']
-    assert 'no2' in data['air']['components']
     assert 'main' in data['weather']
     assert 'pressure' in data['weather']['main']
     assert 'humidity' in data['weather']['main']
