@@ -30,13 +30,18 @@ def get_aqi_data(lat, lon):
     Raises:
         requests.HTTPError: If the API request fails.
     """
-    air_url = (
+
+    aqi_url = (
         f'https://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={API_KEY}'
     )
-    logger.debug(f'Requesting AQI data for lat: {lat}, lon: {lon}')
-    aq_res = requests.get(air_url)
-    aq_res.raise_for_status()
+    logger.debug(f'Requesting air quality data: {aqi_url}')
 
-    air_quality = aq_res.json()['list'][0]
-    logger.debug(f'AQI data retrieved for lat: {lat}, lon: {lon}')
-    return air_quality
+    try:
+        res = requests.get(aqi_url)
+        logger.debug(f'Air Quality API status: {res.status_code}')
+        logger.debug(f'Air Quality API response: {res.text}')
+        res.raise_for_status()
+        return res.json()
+    except requests.RequestException as e:
+        logger.exception(f'Error calling air quality API: {e}')
+        raise

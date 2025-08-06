@@ -51,13 +51,18 @@ class RequestContextFilter(logging.Filter):
 def configure_logging():
     logger = logging.getLogger()
     if logger.handlers:
+        logger.debug("Skipping logger setup as it's already configured")
         return  # Already configured
 
-    LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG').upper()
-    logger.setLevel(getattr(logging, LOG_LEVEL, logging.DEBUG))
+    APP_ENV = os.getenv('APP_ENV', 'development')
+    if APP_ENV == 'production':
+        logger.setLevel(logging.INFO)
+    else:
+        logger.setLevel(logging.DEBUG)
 
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(JSONFormatter())
     console_handler.addFilter(RequestContextFilter())
 
     logger.addHandler(console_handler)
+    logger.debug(f'Logging configured for {APP_ENV} environment')

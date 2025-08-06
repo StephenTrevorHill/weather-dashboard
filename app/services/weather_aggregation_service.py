@@ -44,17 +44,26 @@ def get_all_weather_data(city):
         air_quality = get_aqi_data(lat, lon)
 
         # Map air quality components to friendly names
-        raw_components = air_quality['components']
+        # raw_components = air_quality['components']
+        raw_components = air_quality['list'][0]['components']
+        aqi_main = air_quality['list'][0]['main']
         named_components = {AIR_COMPONENT_LABELS.get(k, k): v for k, v in raw_components.items()}
 
     except Exception as e:
         logger.exception(f"Error fetching data for city '{city}': {e}")
         error = f'Error: {e}'
 
-    logger.debug(f'Returning weather data for city: {city}')
+    # logger.debug(f'Returning weather data for city: {city}')
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f'Returning weather data for city: {city}')
+        logger.debug(f'Weather API response: {weather_data}')
+        logger.debug(f'Air Quality API response: {air_quality}')
+        logger.debug(f'Named air components: {named_components}')
+        logger.debug(f'Error: {error}')
+
     return {
         'weather': weather_data,
-        'air': air_quality,
+        'air': {'main': aqi_main},
         'air_components': named_components,
         'error': error,
     }

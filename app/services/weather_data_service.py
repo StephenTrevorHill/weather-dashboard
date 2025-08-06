@@ -30,9 +30,14 @@ def get_weather(city):
     weather_url = (
         f'https://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={API_KEY}'
     )
-    logger.debug(f'Requesting weather data for city: {city}')
-    res = requests.get(weather_url)
-    res.raise_for_status()
-    weather_data = res.json()
-    logger.debug(f'Weather data received for city: {city}')
-    return weather_data
+    logger.debug(f'Requesting weather data: {weather_url}')
+
+    try:
+        res = requests.get(weather_url)
+        logger.debug(f'Weather API status: {res.status_code}')
+        logger.debug(f'Weather API response: {res.text}')  # or res.json() for parsed data
+        res.raise_for_status()
+        return res.json()
+    except requests.RequestException as e:
+        logger.exception(f'Error calling weather API: {e}')
+        raise
