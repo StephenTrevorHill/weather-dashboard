@@ -80,7 +80,19 @@ This document tracks key development milestones, decisions, and learnings.
 ## [2024-08-02]
 - simplified format of json files - SMP-17 Clean up formatting of JSON files - changed/tested/merged
 - removed and then re-added engineering log to tracking
+- refactored index.html and app.py for simplicity and test coverage
+- pushed changes
+- pushed to Render
+- pulled master to local
 
+
+## [2024-08-03] Logging
+- Refactored logging to use reusable module `logging_config.py`
+- Configured basic JSON-formatted logs to console
+- Verified working in local and test environments
+- Plan: add external log aggregation (e.g. Logtail), include request metadata
+- Tagged version as `v0.4`
+- set up account on LogTail/BetterStack under business email
 
 ## To-Dos ##
 - logging

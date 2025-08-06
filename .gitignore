@@ -3,7 +3,11 @@ __pycache__/
 .env
 venv/
 requirements manual.txt
-utilities/
+_archived
 data/en/archive
 .DS_Store
+data/.DS_Store
 data/en/.DS_Store
+.ruffcache
+.trigger
+data/en/archive/
