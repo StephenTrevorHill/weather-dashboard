@@ -1,5 +1,10 @@
 # app/routes/__init__.py
 
+from dotenv import load_dotenv
+
+# read environments variables
+load_dotenv()
+
 
 def setup_routes(app):
     from .cities_route import setup_routes as setup_city_picker_routes
