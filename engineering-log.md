@@ -94,6 +94,35 @@ This document tracks key development milestones, decisions, and learnings.
 - Tagged version as `v0.4`
 - set up account on LogTail/BetterStack under business email
 
+## [2025-08-06]
+# Logging to BetterStack - https://stephenhill.atlassian.net/browse/SMP-28
+- using BetterStack account created a few days ago - under email address stephen.hill@canadianretailtech.com
+- created a BetterStack source
+  - name Weather Dashboard
+  - platform http
+  - source ID weather_dashboard
+  - source token fdreGCU4Yha84t3Pah2XsnZF
+  - ingesting host s1468787.eu-nbg-2.betterstackdata.com
+- created branch SMP-28-Connect-the-logging-to-an-external-log-aggregator
+- added https log shipping, but this impacted app performance
+
+## [2025-08-07] ##
+- set up log integration from Render to Betterstack directly
+  - credentials: 
+    - Log Endpoint: s1469629.eu-nbg-2-vec.betterstackdata.com:6514
+    - Token:        UreBPTtWa7bKDTv4nrP3ZeFg
+- configured render to ship logs to BetterHost (Source Name=Weather Dashboard 2)
+- worked on asynch sending to BetterHost over http
+- added a .env config parameter
+  - log shipping tooling: [ none | betterstack ] 
+  - LOG_SHIPPING=betterstack
+- installed celery and redis (pip install celery==5.4.0 redis==5.0.8)
+- signed up for free-tier docker - account authed by github, username StephenTrevorHill 
+- downloaded Docker desktop
+- started a redis container
+- *** TODO:*** explore Docker
+
+
 ## To-Dos ##
 - logging
 - better handling of errors

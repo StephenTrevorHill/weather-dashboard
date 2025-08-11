@@ -6,10 +6,9 @@ based on a city name.
 """
 
 import logging
+import os
 
 import requests
-
-from app.config import API_KEY
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +26,8 @@ def get_weather(city):
     Raises:
         requests.HTTPError: If the API request fails.
     """
+
+    API_KEY = os.getenv('OPENWEATHER_API_KEY')
     weather_url = (
         f'https://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={API_KEY}'
     )

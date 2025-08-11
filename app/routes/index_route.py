@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 def setup_routes(app):
     @app.route('/', methods=['GET', 'POST'])
-    def index():
+    def index():  # will be flagged unused as it's only called by API route (from JavaScript)
         logger.debug(f'Default route hit for {request.method} from {request.remote_addr}')
 
         if request.method == 'POST':

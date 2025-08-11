@@ -1,11 +1,21 @@
 import logging
 
-from app.config import AIR_COMPONENT_LABELS
-
 from .air_quality_data_service import get_aqi_data
 from .weather_data_service import get_weather
 
 logger = logging.getLogger(__name__)
+
+# load detailed names for air quality components
+AIR_COMPONENT_LABELS = {
+    'co': 'Carbon Monoxide (CO)',
+    'no': 'Nitric Oxide (NO)',
+    'no2': 'Nitrogen Dioxide (NO₂)',
+    'o3': 'Ozone (O₃)',
+    'so2': 'Sulfur Dioxide (SO₂)',
+    'pm2_5': 'Fine Particulate Matter (PM2.5)',
+    'pm10': 'Coarse Particulate Matter (PM10)',
+    'nh3': 'Ammonia (NH₃)',
+}
 
 
 def get_all_weather_data(city):
@@ -39,12 +49,15 @@ def get_all_weather_data(city):
         weather_data = get_weather(city)
 
         # Get Air Quality using lat/long from previous call
+        logger.debug('Setting up to call module to get AQI data')
         lat = weather_data['coord']['lat']
         lon = weather_data['coord']['lon']
+        logger.debug(f'Lat: {lat}, Long {lon}')
         air_quality = get_aqi_data(lat, lon)
 
         # Map air quality components to friendly names
         # raw_components = air_quality['components']
+        logger.debug('Mapping AQI data to named components')
         raw_components = air_quality['list'][0]['components']
         aqi_main = air_quality['list'][0]['main']
         named_components = {AIR_COMPONENT_LABELS.get(k, k): v for k, v in raw_components.items()}

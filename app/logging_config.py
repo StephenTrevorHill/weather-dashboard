@@ -2,9 +2,12 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask import request
+
+from app.config import APP_ENV, APP_VERSION
+from app.tasks.log_tasks import send_log_to_betterstack
 
 
 class JSONFormatter(logging.Formatter):
@@ -14,14 +17,14 @@ class JSONFormatter(logging.Formatter):
 
     def format(self, record):
         # Create timezone-aware datetime from record.created
-        dt = datetime.fromtimestamp(record.created).astimezone()
-        timestamp = dt.strftime(self.datefmt)
 
         log_record = {
+            'dt': datetime.now(timezone.utc).isoformat(),
             'level': record.levelname,
             'message': record.getMessage(),
             'logger': record.name,
-            'time': timestamp,
+            'app_env': APP_ENV,
+            'version': APP_VERSION,
             'pathname': record.pathname,
             'lineno': record.lineno,
             'funcName': record.funcName,
@@ -48,13 +51,23 @@ class RequestContextFilter(logging.Filter):
         return True
 
 
+class CeleryBetterstackHandler(logging.Handler):
+    def emit(self, record):
+        try:
+            msg = self.format(record)  # JSON string from your JSONFormatter
+            print('DEBUG: queueing BetterStack log via Celery')
+            print(f'record contents: {record}')
+            send_log_to_betterstack.delay(msg)
+        except Exception:
+            self.handleError(record)
+
+
 def configure_logging():
     logger = logging.getLogger()
     if logger.handlers:
         logger.debug("Skipping logger setup as it's already configured")
         return  # Already configured
 
-    APP_ENV = os.getenv('APP_ENV', 'development')
     if APP_ENV == 'production':
         logger.setLevel(logging.INFO)
     else:
@@ -65,4 +78,14 @@ def configure_logging():
     console_handler.addFilter(RequestContextFilter())
 
     logger.addHandler(console_handler)
+
+    LOG_SHIPPING = os.getenv('LOG_SHIPPING', 'none').strip().lower()
+    if LOG_SHIPPING == 'betterstack':
+        celery_handler = CeleryBetterstackHandler()
+        celery_handler.setFormatter(JSONFormatter())
+        celery_handler.addFilter(RequestContextFilter())
+        logger.addHandler(celery_handler)
+        logger.info('Celery-based async log shipping enabled')
+        logger.info('Betterstack logging configured.')
+
     logger.debug(f'Logging configured for {APP_ENV} environment')
